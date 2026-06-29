@@ -1,3 +1,7 @@
+export interface ParseRequest {
+  rawText: string;
+}
+
 type TransportMode = "driving" | "walking" | "transit";
 
 interface TripMeta {
@@ -14,20 +18,20 @@ interface ParsedStop {
   fixedTimes?: { start: number; end: number };
 }
 
-interface ParsedTrip extends TripMeta {
+export interface ParsedTrip extends TripMeta {
   stops: ParsedStop[];
 }
 
 interface GeocodedStop extends ParsedStop {
   readonly id: string;
-  location: {lat: number, lng: number};
+  location: { lat: number; lng: number };
 }
 
-interface GeocodedTrip extends TripMeta {
+export interface GeocodedTrip extends TripMeta {
   stops: GeocodedStop[];
 }
 
-interface RoutableTrip extends GeocodedTrip {
+export interface RoutableTrip extends GeocodedTrip {
   travelTimes: number[][];
 }
 
@@ -38,7 +42,11 @@ interface ScheduledStop {
   travelToNextMinutes: number;
 }
 
-interface ScheduledTrip extends TripMeta {
+export interface ScheduledTrip extends TripMeta {
   scheduledStops: ScheduledStop[];
   feasible: boolean;
+}
+
+export interface NarratedTrip extends ScheduledTrip {
+  summary: string;
 }

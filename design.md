@@ -15,11 +15,14 @@ Explain the "right tool for each job" split in your own words:
 
 The pipeline
 
-1. Frontend → backend:
-   - ParseRequest { rawText }
+1. Frontend UI →
+   - interface ParseRequest {
+     rawText: string;
+     }
+
    - Conversational design: everything is in the raw text, no forms.
 
-2. LLM parse → ParsedTrip
+2. LLM parse →
    - interface ParsedStop {
      name: string;
      address?: string;
@@ -34,6 +37,7 @@ The pipeline
      dayStart: string; // the day-fits-or-not boundary you caught working backward from the UI
      dayEnd: string;
      }
+
    - The LLM extracted everything a HUMAN can express. No coordinates yet(no one speaks lat/long), no id yet (the system assigns that).
 
 3. Geocode →
@@ -53,6 +57,7 @@ The pipeline
      dayStart: string;
      dayEnd: string;
      }
+
    - Geocoding added ONE thing: coordinates.
 
 4. Maps API →
@@ -64,6 +69,7 @@ The pipeline
      dayStart: string;
      dayEnd: string;
      }
+
    - Maps API added ONE field: the travel-time matrix.
    - INVARIANT: travelTimes[i][j] = time from stops[i] to stops[j].
    - The matrix indices MUST line up with the stops array order.
