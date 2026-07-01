@@ -13,9 +13,9 @@ interface TripMeta {
 
 interface ParsedStop {
   name: string;
-  address: string;
+  address?: string;
   durationMinutes: number;
-  fixedTimes?: { start: number; end: number };
+  fixedTimes?: { start: string; end: string };
 }
 
 export interface ParsedTrip extends TripMeta {
