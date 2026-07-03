@@ -13,6 +13,7 @@ interface TripMeta {
 
 interface ParsedStop {
   name: string;
+  event?: string;
   address?: string;
   durationMinutes: number;
   fixedTimes?: { start: string; end: string };
@@ -22,8 +23,8 @@ export interface ParsedTrip extends TripMeta {
   stops: ParsedStop[];
 }
 
-interface GeocodedStop extends ParsedStop {
-  readonly id: string;
+export interface GeocodedStop extends ParsedStop {
+  readonly place_id: string;
   location: { lat: number; lng: number };
 }
 
