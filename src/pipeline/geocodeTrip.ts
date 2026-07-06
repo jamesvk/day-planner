@@ -27,7 +27,7 @@ export async function geocodeTrip(input: ParsedTrip): Promise<GeocodedTrip> {
       });
     }
 
-    console.log(geocodedStops);
+    // console.log(geocodedStops);
 
     return { ...input, stops: geocodedStops };
   } catch (error) {
