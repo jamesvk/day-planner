@@ -36,13 +36,12 @@ export interface RoutableTrip extends GeocodedTrip {
   travelTimes: number[][];
 }
 
-interface ScheduledStop {
+export interface ScheduledStop {
   stop: GeocodedStop;
   arrivalTime: string;
   departureTime: string;
   travelToNextMinutes: number;
 }
-
 export interface ScheduledTrip extends TripMeta {
   scheduledStops: ScheduledStop[];
   feasible: boolean;

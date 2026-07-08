@@ -1,4 +1,4 @@
-import type { ScheduledTrip, NarratedTrip } from "../types.js";
+import type { ScheduledTrip, NarratedTrip } from "../types.ts";
 
 export async function narrateTrip(input: ScheduledTrip): Promise<NarratedTrip> {
   // TODO

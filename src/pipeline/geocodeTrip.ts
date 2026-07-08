@@ -1,5 +1,6 @@
 import "dotenv/config";
 import type { ParsedTrip, GeocodedStop, GeocodedTrip } from "../types.js";
+import { sleep } from "../utils/sleep.js";
 
 export async function geocodeTrip(input: ParsedTrip): Promise<GeocodedTrip> {
   try {
@@ -25,9 +26,9 @@ export async function geocodeTrip(input: ParsedTrip): Promise<GeocodedTrip> {
         place_id: String(result.place_id),
         location: { lat: parseFloat(result.lat), lng: parseFloat(result.lon) },
       });
-    }
 
-    // console.log(geocodedStops);
+      await sleep(1000);
+    }
 
     return { ...input, stops: geocodedStops };
   } catch (error) {
