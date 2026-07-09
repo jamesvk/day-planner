@@ -47,7 +47,6 @@ export async function parseTrip(input: ParseRequest): Promise<ParsedTrip> {
   let parsed: ParsedTrip;
   try {
     parsed = JSON.parse(jsonString) as ParsedTrip;
-    // console.log("parseTrip", JSON.stringify(parsed, null, 2));
   } catch (error) {
     throw new Error(
       `Failed to parse Claude's response as JSON: ${responseText}`,

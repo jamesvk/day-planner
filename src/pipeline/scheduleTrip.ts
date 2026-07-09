@@ -86,43 +86,5 @@ export function scheduleTrip(input: RoutableTrip): ScheduledTrip {
     throw new Error("No orderings could be scheduled");
   }
 
-  bestFeasible
-    ? console.log(JSON.stringify(bestFeasible, null, 2))
-    : console.log(JSON.stringify(bestOverall, null, 2));
-
   return bestFeasible ?? bestOverall;
 }
-
-// export function scheduleTrip(input: RoutableTrip): ScheduledTrip {
-//   let bestFeasible = null;
-//   let bestOverall = null;
-//   let bestOverallTime: number = 0;
-
-//   const allPermutations: number[][] = permute(
-//     input.stops.map((_, index) => index),
-//   );
-//   // const feasibleTrips: ScheduledTrip[] = [];
-
-//   for (const order of allPermutations) {
-//     const scheduledCandidate = scheduleOneOrder(input, order);
-//     const travelTime = totalTravel(scheduledCandidate);
-
-//     // update bestOverall (any trip, least travel)
-//     if (bestOverall === null || travelTime < bestOverallTime) {
-//       bestOverall = scheduledCandidate;
-//       bestOverallTime = travelTime;
-//     }
-
-//     if (scheduledCandidate.feasible && (bestFeasible === null || travelTime < bestOverallTime)) {
-//       bestFeasible = scheduledCandidate;
-//       bestOverall = scheduledCandidate;
-//       bestOverallTime = travelTime;
-//     }
-//     //   if (scheduledCandidate.feasible) {
-//     //     feasibleTrips.push(scheduledCandidate);
-//     //   }
-//   }
-
-//   // console.log(feasibleTrips);
-//   // console.log(JSON.stringify(feasibleTrips, null, 2));
-// }

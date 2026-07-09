@@ -18,10 +18,7 @@ export async function routeTrip(input: GeocodedTrip): Promise<RoutableTrip> {
     const travelTimes = data.durations.map((times: number[]) =>
       times.map((seconds: number) => Math.ceil(seconds / 60)),
     );
-    // console.log(
-    //   "routeTrip exported input >>>>>>>>>>",
-    //   JSON.stringify({ ...input, travelTimes }, null, 2),
-    // );
+
     return { ...input, travelTimes };
   } catch (error) {
     throw new Error(`Failed to get the travel time matrix: ${error}`);
