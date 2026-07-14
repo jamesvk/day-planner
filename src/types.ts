@@ -5,6 +5,7 @@ export interface ParseRequest {
 type TransportMode = "driving" | "walking" | "transit";
 
 interface TripMeta {
+  rawText: string;
   date: string;
   transportMode: TransportMode;
   dayStart: string;
@@ -42,6 +43,7 @@ export interface ScheduledStop {
   departureTime: string;
   travelToNextMinutes: number;
 }
+
 export interface ScheduledTrip extends TripMeta {
   scheduledStops: ScheduledStop[];
   feasible: boolean;

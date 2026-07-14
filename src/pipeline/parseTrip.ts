@@ -53,5 +53,5 @@ export async function parseTrip(input: ParseRequest): Promise<ParsedTrip> {
     );
   }
 
-  return parsed;
+  return { ...input, ...parsed };
 }

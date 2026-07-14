@@ -46,6 +46,7 @@ function scheduleOneOrder(input: RoutableTrip, order: number[]): ScheduledTrip {
     });
   }
   return {
+    rawText: input.rawText,
     date: input.date,
     transportMode: input.transportMode,
     dayStart: input.dayStart,

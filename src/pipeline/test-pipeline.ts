@@ -13,7 +13,7 @@ const rawInput: ParseRequest = {
 async function main() {
   try {
     const result = await planTrip(rawInput);
-    console.log(result);
+    // console.log(result);
   } catch (error) {
     console.error(error);
   }

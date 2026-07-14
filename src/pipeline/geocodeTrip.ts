@@ -29,7 +29,6 @@ export async function geocodeTrip(input: ParsedTrip): Promise<GeocodedTrip> {
 
       await sleep(1000);
     }
-
     return { ...input, stops: geocodedStops };
   } catch (error) {
     throw new Error(`Failed to fetch coordinates: ${error}`);

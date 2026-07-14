@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { planTrip } from "../pipeline/planTrip.js";
 import type { ParseRequest } from "../types.js";
+import saveTrip from "../utils/saveTrip.js";
 
 export async function handlePlanTrip(req: Request, res: Response) {
   try {
@@ -13,6 +14,8 @@ export async function handlePlanTrip(req: Request, res: Response) {
     }
 
     const trip = await planTrip({ rawText });
+    await saveTrip(trip);
+
     return res.status(200).json(trip);
   } catch (err) {
     console.log(err);
