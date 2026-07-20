@@ -52,3 +52,30 @@ export interface ScheduledTrip extends TripMeta {
 export interface NarratedTrip extends ScheduledTrip {
   summary: string;
 }
+
+interface RetrievedStop {
+  id: string;
+  stop_order: number;
+  name: string;
+  event?: string;
+  address?: string;
+  readonly place_id: string | null;
+  lat: number;
+  lng: number;
+  arrivalTime: string;
+  departureTime: string;
+  travelToNextMinutes: number | null;
+}
+
+export interface RetrievedTrip {
+  id: string;
+  rawText: string;
+  date: string;
+  transportMode: TransportMode;
+  dayStart: string;
+  dayEnd: string;
+  feasible: boolean;
+  createdAt: string;
+  summary: string;
+  scheduledStops: RetrievedStop[];
+}
