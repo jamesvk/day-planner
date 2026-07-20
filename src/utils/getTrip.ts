@@ -2,9 +2,8 @@ import pool from "../db.js";
 import type { RetrievedTrip } from "../types.js";
 
 export default async function getTrip(id: string): Promise<RetrievedTrip> {
-  try {
-    const trip = await pool.query(
-      `
+  const trip = await pool.query(
+    `
             SELECT json_build_object(
                 'id', t.id,
                 'rawText', t.raw_text,
@@ -42,10 +41,7 @@ export default async function getTrip(id: string): Promise<RetrievedTrip> {
             FROM trips t
             WHERE t.id = $1
             `,
-      [id],
-    );
-    return trip.rows[0].trip;
-  } catch (error) {
-    throw error;
-  }
+    [id],
+  );
+  return trip.rows[0].trip;
 }
