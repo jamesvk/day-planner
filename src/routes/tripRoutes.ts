@@ -1,6 +1,7 @@
 import express from "express";
 import {
   handlePlanTrip,
+  handleGetTrips,
   handleGetTrip,
   handleDeleteTrip,
 } from "../controllers/tripController.js";
@@ -8,6 +9,7 @@ import {
 const router = express.Router();
 
 router.post("/", handlePlanTrip);
+router.get("/", handleGetTrips);
 router.get("/:id", handleGetTrip);
 router.delete("/:id", handleDeleteTrip);
 

@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import { planTrip } from "../pipeline/planTrip.js";
 import type { ParseRequest } from "../types.js";
 import saveTrip from "../utils/saveTrip.js";
+import getAllTrips from "../utils/getAllTrips.js";
 import getTrip from "../utils/getTrip.js";
 import deleteTrip from "../utils/deleteTrip.js";
 
@@ -27,6 +28,16 @@ export async function handlePlanTrip(req: Request, res: Response) {
   }
 }
 
+export async function handleGetTrips(req: Request, res: Response) {
+  try {
+    const trips = await getAllTrips();
+    res.status(200).json(trips);
+  } catch (err) {
+    console.error("handleGetTrips error: ", err);
+    return res.status(500).json({ message: "Failed ot retrieve trips" });
+  }
+}
+
 export async function handleGetTrip(req: Request, res: Response) {
   try {
     const id = req.params.id;
@@ -36,7 +47,8 @@ export async function handleGetTrip(req: Request, res: Response) {
     }
 
     const trip = await getTrip(id);
-    res.status(200).json(trip);
+    if (!trip) return res.status(404).json({ message: "Trip not found" });
+    else return res.status(200).json(trip);
   } catch (err) {
     console.error("handleGetTrip error: ", err);
     return res.status(500).json({ message: "Failed to retrieve trip" });

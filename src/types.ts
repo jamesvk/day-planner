@@ -1,3 +1,5 @@
+import type { Interface } from "readline";
+
 export interface ParseRequest {
   rawText: string;
 }
@@ -79,3 +81,18 @@ export interface RetrievedTrip {
   summary: string;
   scheduledStops: RetrievedStop[];
 }
+
+export interface tripSummary {
+  id: string;
+  rawText: string;
+  date: Date;
+  transportMode: TransportMode;
+  dayStart: string;
+  dayEnd: string;
+  feasible: boolean;
+  createdAt: Date;
+  summary: string;
+  stopCount: number;
+}
+
+export type RetrievedTrips = tripSummary[];

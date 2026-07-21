@@ -1,7 +1,9 @@
 import pool from "../db.js";
 import type { RetrievedTrip } from "../types.js";
 
-export default async function getTrip(id: string): Promise<RetrievedTrip> {
+export default async function getTrip(
+  id: string,
+): Promise<RetrievedTrip | null> {
   const trip = await pool.query(
     `
             SELECT json_build_object(
@@ -43,5 +45,7 @@ export default async function getTrip(id: string): Promise<RetrievedTrip> {
             `,
     [id],
   );
-  return trip.rows[0].trip;
+
+  if (!trip.rows.length) return null;
+  else return trip.rows[0].trip;
 }

@@ -34,9 +34,9 @@ export default async function saveTrip(input: NarratedTrip) {
     }
 
     await client.query("COMMIT");
-  } catch (error) {
+  } catch (err) {
     await client.query("ROLLBACK");
-    throw new Error(`Failed to save trip in the database: ${error}`);
+    throw new Error(`Failed to save trip in the database: ${err}`);
   } finally {
     client.release();
   }
