@@ -1,4 +1,17 @@
-import type { Interface } from "readline";
+export interface InputUser {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+}
+
+export interface RegisteredUser {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  accessToken: string;
+}
 
 export interface ParseRequest {
   rawText: string;
