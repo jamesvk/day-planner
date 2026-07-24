@@ -1,9 +1,9 @@
 import pool from "../db.js";
 import bcrypt from "bcryptjs";
-import type { InputUser, RegisteredUser } from "../types.js";
+import type { RegisterInput, RegisteredUser } from "../types.js";
 import { generateToken } from "./generateToken.js";
 
-export async function createUser(user: InputUser): Promise<RegisteredUser> {
+export async function createUser(user: RegisterInput): Promise<RegisteredUser> {
   const { firstName, lastName, email, password } = user;
   const normalizedEmail = email.toLowerCase().trim();
 

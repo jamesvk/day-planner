@@ -13,6 +13,11 @@ export interface RegisteredUser {
   accessToken: string;
 }
 
+export interface FoundUser {
+  id: string;
+  passwordHash: string;
+}
+
 export interface ParseRequest {
   rawText: string;
 }

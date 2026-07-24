@@ -1,18 +1,23 @@
+import bcrypt from "bcryptjs";
+import { generateToken } from "../utils/generateToken.js";
 import type { Request, Response } from "express";
+import type { RegisterInput } from "../types.js";
 import { createUser } from "../utils/createUser.js";
+import { findUserByEmail } from "../utils/findUserByEmail.js";
 
 export async function registerUser(req: Request, res: Response) {
   try {
-    const user = await createUser(req.body);
+    const userInput: RegisterInput = req.body;
+    const user = await createUser(userInput);
 
     return res.status(201).json(user);
-  } catch (error) {
-    console.error("registerUser error: ", error);
+  } catch (err) {
+    console.error("registerUser error: ", err);
     if (
-      typeof error === "object" &&
-      error !== null &&
-      "code" in error &&
-      error.code === "23505"
+      typeof err === "object" &&
+      err !== null &&
+      "code" in err &&
+      err.code === "23505"
     ) {
       return res.status(409).json({ message: "Email already in use" });
     }
@@ -22,6 +27,44 @@ export async function registerUser(req: Request, res: Response) {
       .json({ message: "Server error during registration" });
   }
 }
+
+export async function loginUser(req: Request, res: Response) {
+  try {
+    const { email, password } = req.body;
+    const user = await findUserByEmail(email);
+
+    if (!user)
+      return res.status(401).json({ message: "Invalid email or password" });
+
+    const isMatch = await bcrypt.compare(password, user.passwordHash);
+    if (!isMatch)
+      return res.status(401).json({ message: "Invalid email or password" });
+
+    const accessToken = generateToken(user.id);
+    return res.status(200).json({ id: user.id, accessToken });
+  } catch (err) {
+    console.error("loginUser error: ", err);
+    return res.status(500).json({ message: "Server error during login" });
+  }
+}
+
+// router.post('/login', async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+
+//     const user = await User.findOne({ email });
+//     if (!user || !(await user.matchPassword(password))) {
+//       return res.status(401).json({ message: 'Invalid email or password' });
+//     }
+
+//     const token = signToken(user._id);
+
+//     // res.cookie('token', token, cookieOptions);
+//     res.json({ _id: user._id, name: user.name, email: user.email, token });
+//   } catch {
+//     res.status(500).json({ message: 'Server error during login' });
+//   }
+// });
 
 // import pool from "../db.js";
 // import bcrypt from "bcryptjs";
