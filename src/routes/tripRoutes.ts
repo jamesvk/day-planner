@@ -1,4 +1,5 @@
 import express from "express";
+import { protect } from "../middleware/auth.js";
 import {
   handlePlanTrip,
   handleGetTrips,
@@ -7,6 +8,8 @@ import {
 } from "../controllers/tripController.js";
 
 const router = express.Router();
+
+router.use(protect);
 
 router.post("/", handlePlanTrip);
 router.get("/", handleGetTrips);

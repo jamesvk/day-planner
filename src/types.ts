@@ -1,4 +1,14 @@
-export interface InputUser {
+import type { Request } from "express";
+
+export interface AuthTokenPayload {
+  id: string;
+}
+
+export interface AuthenticatedRequest extends Request {
+  user?: { id: string };
+}
+
+export interface RegisterInput {
   firstName: string;
   lastName: string;
   email: string;
@@ -13,7 +23,7 @@ export interface RegisteredUser {
   accessToken: string;
 }
 
-export interface FoundUser {
+export interface UserCredentials {
   id: string;
   passwordHash: string;
 }
@@ -100,7 +110,7 @@ export interface RetrievedTrip {
   scheduledStops: RetrievedStop[];
 }
 
-export interface tripSummary {
+export interface TripSummary {
   id: string;
   rawText: string;
   date: Date;
@@ -113,4 +123,4 @@ export interface tripSummary {
   stopCount: number;
 }
 
-export type RetrievedTrips = tripSummary[];
+export type RetrievedTrips = TripSummary[];

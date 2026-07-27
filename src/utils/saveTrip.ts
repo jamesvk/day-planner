@@ -1,7 +1,7 @@
 import pool from "../db.js";
 import type { NarratedTrip } from "../types.js";
 
-export default async function saveTrip(input: NarratedTrip) {
+export default async function saveTrip(input: NarratedTrip, id: string) {
   const { rawText, date, transportMode, dayStart, dayEnd, feasible, summary } =
     input;
   const client = await pool.connect();
@@ -9,8 +9,8 @@ export default async function saveTrip(input: NarratedTrip) {
   try {
     await client.query("BEGIN");
     const savedTrip = await client.query(
-      `INSERT INTO trips (raw_text, date, transport_mode, day_start, day_end, feasible, summary) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
-      [rawText, date, transportMode, dayStart, dayEnd, feasible, summary],
+      `INSERT INTO trips (raw_text, date, transport_mode, day_start, day_end, feasible, summary, user_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
+      [rawText, date, transportMode, dayStart, dayEnd, feasible, summary, id],
     );
     const savedTripId = savedTrip.rows[0].id;
 

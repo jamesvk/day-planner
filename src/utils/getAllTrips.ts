@@ -1,8 +1,10 @@
 import pool from "../db.js";
-import type { tripSummary, RetrievedTrips } from "../types.js";
+import type { TripSummary, RetrievedTrips } from "../types.js";
 
-export default async function getAllTrips(): Promise<RetrievedTrips> {
-  const trips = await pool.query<tripSummary>(
+export default async function getAllTrips(
+  userId: string,
+): Promise<RetrievedTrips> {
+  const trips = await pool.query<TripSummary>(
     `
             SELECT
                 t.id,
@@ -16,8 +18,10 @@ export default async function getAllTrips(): Promise<RetrievedTrips> {
                 t.summary,
                 (SELECT COUNT(*)::int FROM scheduled_stops s WHERE s.trip_id = t.id) AS "stopCount"
             FROM trips t
+            WHERE t.user_id = $1
             ORDER BY t.created_at DESC
         `,
+    [userId],
   );
 
   return trips.rows;
