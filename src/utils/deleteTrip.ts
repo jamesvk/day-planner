@@ -1,11 +1,15 @@
 import pool from "../db.js";
 
-export default async function deleteTrip(id: string): Promise<boolean> {
+export default async function deleteTrip(
+  tripId: string,
+  userID: string,
+): Promise<boolean> {
   const deletedTrip = await pool.query(
     `
-                DELETE FROM trips WHERE id = $1;
+                DELETE FROM trips t
+                WHERE t.id = $1 AND t.user_id = $2;
             `,
-    [id],
+    [tripId, userID],
   );
 
   return (deletedTrip.rowCount ?? 0) > 0;

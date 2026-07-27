@@ -42,15 +42,18 @@ export async function handleGetTrips(req: AuthenticatedRequest, res: Response) {
   }
 }
 
-export async function handleGetTrip(req: Request, res: Response) {
+export async function handleGetTrip(req: AuthenticatedRequest, res: Response) {
   try {
+    if (!req.user) {
+      return res.status(401).json({ message: "Not Authorized" });
+    }
     const id = req.params.id;
 
     if (!id || Array.isArray(id)) {
       return res.status(400).json({ message: "Invalid id" });
     }
 
-    const trip = await getTrip(id);
+    const trip = await getTrip(id, req.user.id);
     if (!trip) return res.status(404).json({ message: "Trip not found" });
     else return res.status(200).json(trip);
   } catch (err) {
@@ -59,15 +62,21 @@ export async function handleGetTrip(req: Request, res: Response) {
   }
 }
 
-export async function handleDeleteTrip(req: Request, res: Response) {
+export async function handleDeleteTrip(
+  req: AuthenticatedRequest,
+  res: Response,
+) {
   try {
+    if (!req.user) {
+      return res.status(401).json({ mesage: "Not Authorized" });
+    }
     const id = req.params.id;
 
     if (!id || Array.isArray(id)) {
       return res.status(400).json({ message: "Invalid id" });
     }
 
-    const deleted = await deleteTrip(id);
+    const deleted = await deleteTrip(id, req.user.id);
     if (!deleted) return res.status(404).json({ message: "Trip not found" });
     return res.status(204).end();
   } catch (err) {
