@@ -1,20 +1,13 @@
-
-Schema · SQL
 -- ============================================================
 -- day-planner-backend — database schema
 -- PostgreSQL (Neon)
 --
--- Run order matters: users must exist before trips (FK), and
--- trips before scheduled_stops (FK).
---
--- NOTE: trips.summary and trips.user_id were added to the live
--- database via ALTER after the original CREATE TABLE, so their
--- physical column order in Neon differs from this file. Postgres
--- cannot reorder columns; this file reflects the intended logical
--- order for a fresh install. Functionally identical either way.
+-- Run order matters (foreign keys): users → trips → scheduled_stops.
+-- This file builds a fresh database from scratch; run it as-is against
+-- an empty database (e.g. the test database).
 -- ============================================================
- 
- 
+
+
 -- ------------------------------------------------------------
 -- users
 -- ------------------------------------------------------------
@@ -26,14 +19,14 @@ CREATE TABLE users (
     password_hash  VARCHAR(60)  NOT NULL,  -- bcrypt output is always 60 chars
     created_at     TIMESTAMPTZ  NOT NULL DEFAULT now()
 );
- 
+
 -- Case-insensitive uniqueness. The inline UNIQUE above catches exact
 -- duplicates; this functional index catches case variants, so
 -- James@X.com and james@x.com cannot both register.
 -- Expression indexes cannot be declared inside CREATE TABLE.
 CREATE UNIQUE INDEX users_email_lower_idx ON users (LOWER(email));
- 
- 
+
+
 -- ------------------------------------------------------------
 -- trips
 -- One row per planned trip. Immutable pipeline output: there is no
@@ -52,8 +45,11 @@ CREATE TABLE trips (
     summary         TEXT         NOT NULL,
     created_at      TIMESTAMPTZ  NOT NULL DEFAULT now()
 );
- 
- 
+
+-- Look up a user's trips (list view) efficiently.
+CREATE INDEX trips_user_id_idx ON trips (user_id);
+
+
 -- ------------------------------------------------------------
 -- scheduled_stops
 -- Child rows of a trip. ON DELETE CASCADE means deleting a trip
@@ -77,4 +73,7 @@ CREATE TABLE scheduled_stops (
     departure_time          TIME              NOT NULL,
     travel_to_next_minutes  INTEGER
 );
- 
+
+-- Fetch a trip's stops in order (detail view / getTrip subquery).
+CREATE INDEX scheduled_stops_trip_id_idx ON scheduled_stops (trip_id);
+
