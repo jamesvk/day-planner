@@ -8,6 +8,14 @@ import { findUserByEmail } from "../utils/findUserByEmail.js";
 export async function registerUser(req: Request, res: Response) {
   try {
     const userInput: RegisterInput = req.body;
+    if (
+      !userInput.firstName ||
+      !userInput.lastName ||
+      !userInput.email ||
+      !userInput.password
+    ) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
     const user = await createUser(userInput);
 
     return res.status(201).json(user);
@@ -31,6 +39,10 @@ export async function registerUser(req: Request, res: Response) {
 export async function loginUser(req: Request, res: Response) {
   try {
     const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
     const user = await findUserByEmail(email);
 
     if (!user)
