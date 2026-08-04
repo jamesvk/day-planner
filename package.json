@@ -6,7 +6,9 @@
   "scripts": {
     "test": "vitest",
     "test:run": "vitest run",
-    "dev": "tsx watch src/index.ts"
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
   },
   "keywords": [],
   "author": "",
