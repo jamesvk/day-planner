@@ -49,6 +49,42 @@ async function seedTrip(userId: string, overrides = {}) {
   return result.rows[0].id;
 }
 
+async function seedStop(tripId: string, overrides = {}) {
+  const stop = {
+    stopOrder: 1,
+    name: 'Test Stop',
+    event: 'test event',
+    address: '123 Test St, New York, NY',
+    placeId: 'test-place-id-123',
+    lat: 40.7128,
+    lng: -74.006,
+    arrivalTime: '10:00',
+    departureTime: '11:00',
+    travelToNextMinutes: 15,
+    ...overrides,
+  };
+
+  const result = await pool.query(
+    `INSERT INTO scheduled_stops (trip_id, stop_order, name, event, address, place_id, lat, lng, arrival_time, departure_time, travel_to_next_minutes)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+     RETURNING id`,
+    [
+      tripId,
+      stop.stopOrder,
+      stop.name,
+      stop.event,
+      stop.address,
+      stop.placeId,
+      stop.lat,
+      stop.lng,
+      stop.arrivalTime,
+      stop.departureTime,
+      stop.travelToNextMinutes,
+    ],
+  );
+  return result.rows[0].id;
+}
+
 describe('POST /api/trips', () => {
   it('returns a 401 when no token is provided', async () => {
     const resPost = await request(app)
@@ -169,6 +205,33 @@ describe('GET /api/trips/:id', () => {
   it('returns 401 when no token is provided', async () => {
     const resGet = await request(app).get(`/api/trips/${crypto.randomUUID()}`);
     expect(resGet.status).toBe(401);
+  });
+
+  it('returns the trip with its scheduled stops ordered by stop_order', async () => {
+    const userA = await registerTestUser();
+    const tripA1 = await seedTrip(userA.body.id);
+    await seedStop(tripA1);
+    await seedStop(tripA1, {
+      stopOrder: 2,
+      name: 'Test Stop2',
+      event: 'test event2',
+      address: '456 Testing Avenue, New York, NY',
+      placeId: 'testing-place-id-1234',
+      lat: 41.7128,
+      lng: -75.006,
+      arrivalTime: '11:15',
+      departureTime: '12:00',
+      travelToNextMinutes: 0,
+    });
+
+    const resGet = await request(app)
+      .get(`/api/trips/${tripA1}`)
+      .set('Authorization', `Bearer ${userA.body.accessToken}`);
+
+    expect(resGet.status).toBe(200);
+    expect(resGet.body.id).toBe(tripA1);
+    expect(resGet.body.scheduledStops).toHaveLength(2);
+    expect(resGet.body.scheduledStops[1].name).toBe('Test Stop2');
   });
 });
 
