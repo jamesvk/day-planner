@@ -6,7 +6,75 @@ export interface RegisteredUser {
   accessToken: string;
 }
 
-export interface LoginReponse {
+export interface LoginResponse {
   id: string;
   accessToken: string;
+}
+
+interface TripStop {
+  name: string;
+  event?: string;
+  address?: string;
+  durationMinutes: number;
+  fixedTimes?: { start: string; end: string };
+  place_id: string;
+  location: { lat: number; lng: number };
+}
+
+interface ScheduledStop {
+  stop: TripStop;
+  arrivalTime: string;
+  departureTime: string;
+  travelToNextMinutes: number;
+}
+
+export interface CreatedTrip {
+  summary: string;
+  scheduledStops: ScheduledStop[];
+  feasible: boolean;
+  rawText: string;
+  date: string;
+  transportMode: 'driving' | 'walking' | 'transit';
+  dayStart: string;
+  dayEnd: string;
+}
+
+export interface TripSummary {
+  id: string;
+  rawText: string;
+  date: string;
+  transportMode: 'driving' | 'walking' | 'transit';
+  dayStart: string;
+  dayEnd: string;
+  feasible: boolean;
+  createdAt: string;
+  summary: string;
+  stopCount: number;
+}
+
+interface RetrievedStop {
+  id: string;
+  stop_order: number;
+  name: string;
+  event?: string;
+  address?: string;
+  place_id: string | null;
+  lat: number;
+  lng: number;
+  arrivalTime: string;
+  departureTime: string;
+  travelToNextMinutes: number | null;
+}
+
+export interface RetrievedTrip {
+  id: string;
+  rawText: string;
+  date: string;
+  transportMode: 'driving' | 'walking' | 'transit';
+  dayStart: string;
+  dayEnd: string;
+  feasible: boolean;
+  createdAt: string;
+  summary: string;
+  scheduledStops: RetrievedStop[];
 }
