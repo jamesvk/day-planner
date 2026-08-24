@@ -1,3 +1,22 @@
+import type { ReactNode } from "react";
+
+export interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export interface AuthContextType {
+  userId: string | null;
+  token: string | null;
+  login: (email: string, password: string) => Promise<void>;
+  register: (
+    firstName: string,
+    lastName: string,
+    email: string,
+    password: string,
+  ) => Promise<void>;
+  logout: () => void;
+}
+
 export interface RegisteredUser {
   id: string;
   firstName: string;
@@ -34,7 +53,7 @@ export interface CreatedTrip {
   feasible: boolean;
   rawText: string;
   date: string;
-  transportMode: 'driving' | 'walking' | 'transit';
+  transportMode: "driving" | "walking" | "transit";
   dayStart: string;
   dayEnd: string;
 }
@@ -43,7 +62,7 @@ export interface TripSummary {
   id: string;
   rawText: string;
   date: string;
-  transportMode: 'driving' | 'walking' | 'transit';
+  transportMode: "driving" | "walking" | "transit";
   dayStart: string;
   dayEnd: string;
   feasible: boolean;
@@ -70,7 +89,7 @@ export interface RetrievedTrip {
   id: string;
   rawText: string;
   date: string;
-  transportMode: 'driving' | 'walking' | 'transit';
+  transportMode: "driving" | "walking" | "transit";
   dayStart: string;
   dayEnd: string;
   feasible: boolean;
