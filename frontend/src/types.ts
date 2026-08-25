@@ -20,6 +20,10 @@ export interface AuthContextType {
 
 export type FormSubmitEvent = SubmitEvent<HTMLFormElement>;
 
+export interface ProtectedRouteProps {
+  children: ReactNode;
+}
+
 export interface RegisteredUser {
   id: string;
   firstName: string;
