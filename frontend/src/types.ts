@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import type { SubmitEvent } from "react";
 
 export interface AuthProviderProps {
   children: ReactNode;
@@ -16,6 +17,8 @@ export interface AuthContextType {
   ) => Promise<void>;
   logout: () => void;
 }
+
+export type FormSubmitEvent = SubmitEvent<HTMLFormElement>;
 
 export interface RegisteredUser {
   id: string;
