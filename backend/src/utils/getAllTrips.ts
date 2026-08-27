@@ -19,8 +19,7 @@ export default async function getAllTrips(
                 (SELECT COUNT(*)::int FROM scheduled_stops s WHERE s.trip_id = t.id) AS "stopCount"
             FROM trips t
             WHERE t.user_id = $1
-            ORDER BY t.created_at DESC
-        `,
+            ORDER BY t.date ASC        `,
     [userId],
   );
 
