@@ -22,7 +22,6 @@ export default function TripList() {
     load();
   }, []);
 
-  console.log(">>>>>>>>>>", trips);
   if (loading)
     return (
       <p className="p-8 text-center text-sm text-gray-500">Loading trips…</p>
@@ -52,7 +51,7 @@ export default function TripList() {
               <Link
                 key={trip.id}
                 to={`/trips/${trip.id}`}
-                className="block rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition hover:border-indigo-300 hover:shadow"
+                className="block rounded-lg border border-indigo-100 bg-indigo-50 p-4 shadow-sm transition hover:border-indigo-300 hover:bg-indigo-100 hover:shadow"
               >
                 <div className="flex items-center justify-between gap-3">
                   <p className="truncate font-medium text-gray-900">{city}</p>
