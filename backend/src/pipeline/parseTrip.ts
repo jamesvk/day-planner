@@ -2,6 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import "dotenv/config";
 import type { ParseRequest, ParsedTrip } from "../types.js";
 import { ValidationError } from "../utils/errors.js";
+import { normalizeDayWindow } from "../utils/normalizeDayWindow.js";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -58,5 +59,5 @@ export async function parseTrip(input: ParseRequest): Promise<ParsedTrip> {
     );
   }
 
-  return { ...input, ...parsed };
+  return normalizeDayWindow({ ...input, ...parsed });
 }

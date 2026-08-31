@@ -4,6 +4,14 @@ import { permute } from "../utils/permutations.js";
 import { totalTravel } from "../utils/totalTravel.js";
 import { ValidationError } from "../utils/errors.js";
 
+function runsPastMidnight(trip: ScheduledTrip): boolean {
+  return trip.scheduledStops.some(
+    (s) =>
+      Number(s.arrivalTime.slice(0, 2)) >= 24 ||
+      Number(s.departureTime.slice(0, 2)) >= 24,
+  );
+}
+
 function scheduleOneOrder(input: RoutableTrip, order: number[]): ScheduledTrip {
   let currentTime = timeToMinutes(input.dayStart);
   const dayEndMinutes = timeToMinutes(input.dayEnd);
@@ -47,18 +55,7 @@ function scheduleOneOrder(input: RoutableTrip, order: number[]): ScheduledTrip {
     });
   }
 
-  for (const s of scheduledStops) {
-    if (
-      Number(s.arrivalTime.slice(0, 2)) >= 24 ||
-      Number(s.departureTime.slice(0, 2)) >= 24
-    ) {
-      throw new ValidationError(
-        "This itinerary runs past midnight. Try removing a stop, shortening a visit, or widening your day.",
-      );
-    }
-  }
-
-  return {
+  const result = {
     rawText: input.rawText,
     city: input.city,
     date: input.date,
@@ -68,6 +65,10 @@ function scheduleOneOrder(input: RoutableTrip, order: number[]): ScheduledTrip {
     scheduledStops,
     feasible,
   };
+
+  if (runsPastMidnight(result)) result.feasible = false;
+
+  return result;
 }
 
 export function scheduleTrip(input: RoutableTrip): ScheduledTrip {
@@ -101,5 +102,12 @@ export function scheduleTrip(input: RoutableTrip): ScheduledTrip {
     throw new Error("No orderings could be scheduled");
   }
 
-  return bestFeasible ?? bestOverall;
+  const chosen = bestFeasible ?? bestOverall;
+  if (runsPastMidnight(chosen)) {
+    throw new ValidationError(
+      "This itinerary runs past midnight. Try removing a stop, shortening a visit, or widening your day.",
+    );
+  }
+
+  return chosen;
 }
