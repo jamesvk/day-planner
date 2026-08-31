@@ -3,8 +3,17 @@ import { useState } from "react";
 import type { FormSubmitEvent } from "../types";
 import { createTrip } from "../api/trips";
 
+const STOPS_PLACEHOLDER = `Metropolitan Museum of Art, 1000 Fifth Avenue — 2 hours
+Katz's Delicatessen, 205 East Houston Street — 1 hour
+High Line, Manhattan — 90 minutes
+Balthazar, 80 Spring Street — 7pm reservation, 2 hours`;
+
 export default function CreateTrip() {
-  const [rawText, setRawText] = useState<string>("");
+  const [city, setCity] = useState<string>("");
+  const [date, setDate] = useState<string>("");
+  const [startTime, setStartTime] = useState<string>("09:00");
+  const [endTime, setEndTime] = useState<string>("21:00");
+  const [stops, setStops] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
@@ -14,11 +23,15 @@ export default function CreateTrip() {
     setLoading(true);
     setError(null);
 
+    const rawText = `Day in ${city} on ${date}, driving. Start at ${startTime} and finish by ${endTime}.
+
+${stops}`;
+
     try {
       const created = await createTrip(rawText);
       navigate(`/trips/${created.id}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed");
+      setError(err instanceof Error ? err.message : "Failed to create trip");
     } finally {
       setLoading(false);
     }
@@ -42,29 +55,95 @@ export default function CreateTrip() {
         >
           <div className="space-y-1">
             <label
-              htmlFor="rawText"
+              htmlFor="city"
               className="block text-sm font-medium text-gray-700"
             >
-              Describe your day
+              City
+            </label>
+            <input
+              id="city"
+              type="text"
+              required
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              placeholder="New York, New York, USA"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+            />
+          </div>
+
+          <div className="space-y-1">
+            <label
+              htmlFor="date"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Date
+            </label>
+            <input
+              id="date"
+              type="date"
+              required
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label
+                htmlFor="startTime"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Day starts
+              </label>
+              <input
+                id="startTime"
+                type="time"
+                required
+                value={startTime}
+                onChange={(e) => setStartTime(e.target.value)}
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label
+                htmlFor="endTime"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Day ends
+              </label>
+              <input
+                id="endTime"
+                type="time"
+                required
+                value={endTime}
+                onChange={(e) => setEndTime(e.target.value)}
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <label
+              htmlFor="stops"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Your stops
             </label>
             <p className="text-xs text-gray-500">
-              For best results, include the{" "}
-              <span className="font-medium">city</span>, the{" "}
-              <span className="font-medium">date</span> (with the year), and the{" "}
-              <span className="font-medium">hours</span> you want your day to
-              run. For each stop, give the{" "}
+              One per line. Include the{" "}
               <span className="font-medium">full address</span>, how long you'll
               stay, and any <span className="font-medium">fixed times</span> — a
-              dinner reservation, a tour slot, a game start. Trips are currently
-              planned as driving routes.
+              dinner reservation, a tour slot, a game start.
             </p>
             <textarea
-              id="rawText"
+              id="stops"
               required
               rows={8}
-              value={rawText}
-              onChange={(e) => setRawText(e.target.value)}
-              placeholder="Day in New York City on September 12th, 2026, getting around by transit. I'd like to start around 10am and be done by 10pm. Metropolitan Museum of Art at 1000 Fifth Avenue, Manhattan — about 2 hours. Lunch at Katz's Delicatessen at 205 East Houston Street, Manhattan — an hour. Washington Square Park in Greenwich Village, Manhattan — an hour. Knicks game at Madison Square Square Garden, 4 Pennsylvania Plaza — starts at 7pm, about 3 hours."
+              value={stops}
+              onChange={(e) => setStops(e.target.value)}
+              placeholder={STOPS_PLACEHOLDER}
               className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
             />
           </div>
