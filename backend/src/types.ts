@@ -37,6 +37,7 @@ type TransportMode = "driving" | "walking" | "transit";
 interface TripMeta {
   rawText: string;
   date: string;
+  city: string;
   transportMode: TransportMode;
   dayStart: string;
   dayEnd: string;

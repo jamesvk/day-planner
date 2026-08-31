@@ -1,10 +1,11 @@
-import type { Request, Response } from "express";
+import type { Response } from "express";
 import { planTrip } from "../pipeline/planTrip.js";
 import type { ParseRequest, AuthenticatedRequest } from "../types.js";
 import saveTrip from "../utils/saveTrip.js";
 import getAllTrips from "../utils/getAllTrips.js";
 import getTrip from "../utils/getTrip.js";
 import deleteTrip from "../utils/deleteTrip.js";
+import { ValidationError } from "../utils/errors.js";
 
 export async function handlePlanTrip(req: AuthenticatedRequest, res: Response) {
   try {
@@ -20,11 +21,15 @@ export async function handlePlanTrip(req: AuthenticatedRequest, res: Response) {
     }
 
     const trip = await planTrip({ rawText });
+    console.log(JSON.stringify(trip, null, 2));
     await saveTrip(trip, req.user.id);
 
     return res.status(200).json(trip);
   } catch (err) {
-    console.log(err);
+    if (err instanceof ValidationError) {
+      return res.status(400).json({ message: err.message });
+    }
+    console.error(err);
     return res.status(500).json({ message: "Failed to plan trip" });
   }
 }
@@ -38,7 +43,7 @@ export async function handleGetTrips(req: AuthenticatedRequest, res: Response) {
     res.status(200).json(trips);
   } catch (err) {
     console.error("handleGetTrips error: ", err);
-    return res.status(500).json({ message: "Failed ot retrieve trips" });
+    return res.status(500).json({ message: "Failed to retrieve trips" });
   }
 }
 
@@ -68,7 +73,7 @@ export async function handleDeleteTrip(
 ) {
   try {
     if (!req.user) {
-      return res.status(401).json({ mesage: "Not Authorized" });
+      return res.status(401).json({ message: "Not Authorized" });
     }
     const id = req.params.id;
 
