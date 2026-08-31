@@ -15,8 +15,8 @@ export default function CreateTrip() {
     setError(null);
 
     try {
-      await createTrip(rawText);
-      navigate("/trips");
+      const created = await createTrip(rawText);
+      navigate(`/trips/${created.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
     } finally {
@@ -48,16 +48,15 @@ export default function CreateTrip() {
               Describe your day
             </label>
             <p className="text-xs text-gray-500">
-              For best results, include: the{" "}
+              For best results, include the{" "}
               <span className="font-medium">city</span>, the{" "}
-              <span className="font-medium">date</span> (with the year), how
-              you're <span className="font-medium">getting around</span>{" "}
-              (driving, walking, or transit), and the{" "}
+              <span className="font-medium">date</span> (with the year), and the{" "}
               <span className="font-medium">hours</span> you want your day to
               run. For each stop, give the{" "}
               <span className="font-medium">full address</span>, how long you'll
               stay, and any <span className="font-medium">fixed times</span> — a
-              dinner reservation, a tour slot, a game start.
+              dinner reservation, a tour slot, a game start. Trips are currently
+              planned as driving routes.
             </p>
             <textarea
               id="rawText"

@@ -59,5 +59,5 @@ export async function parseTrip(input: ParseRequest): Promise<ParsedTrip> {
     );
   }
 
-  return normalizeDayWindow({ ...input, ...parsed });
+  return normalizeDayWindow({ ...input, ...parsed, transportMode: "driving" });
 }

@@ -21,10 +21,9 @@ export async function handlePlanTrip(req: AuthenticatedRequest, res: Response) {
     }
 
     const trip = await planTrip({ rawText });
-    console.log(JSON.stringify(trip, null, 2));
-    await saveTrip(trip, req.user.id);
+    const savedTripId = await saveTrip(trip, req.user.id);
 
-    return res.status(200).json(trip);
+    return res.status(200).json({ ...trip, id: savedTripId });
   } catch (err) {
     if (err instanceof ValidationError) {
       return res.status(400).json({ message: err.message });

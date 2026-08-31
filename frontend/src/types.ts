@@ -55,6 +55,7 @@ interface ScheduledStop {
 }
 
 export interface CreatedTrip {
+  id: string;
   summary: string;
   scheduledStops: ScheduledStop[];
   feasible: boolean;

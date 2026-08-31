@@ -1,7 +1,10 @@
 import pool from "../db.js";
 import type { NarratedTrip } from "../types.js";
 
-export default async function saveTrip(input: NarratedTrip, id: string) {
+export default async function saveTrip(
+  input: NarratedTrip,
+  id: string,
+): Promise<string> {
   const { rawText, date, transportMode, dayStart, dayEnd, feasible, summary } =
     input;
   const client = await pool.connect();
@@ -12,7 +15,7 @@ export default async function saveTrip(input: NarratedTrip, id: string) {
       `INSERT INTO trips (raw_text, date, transport_mode, day_start, day_end, feasible, summary, user_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
       [rawText, date, transportMode, dayStart, dayEnd, feasible, summary, id],
     );
-    const savedTripId = savedTrip.rows[0].id;
+    const savedTripId = savedTrip.rows[0].id as string;
 
     for (const [index, s] of input.scheduledStops.entries()) {
       await client.query(
@@ -34,6 +37,7 @@ export default async function saveTrip(input: NarratedTrip, id: string) {
     }
 
     await client.query("COMMIT");
+    return savedTripId;
   } catch (err) {
     await client.query("ROLLBACK");
     throw new Error(`Failed to save trip in the database: ${err}`);
