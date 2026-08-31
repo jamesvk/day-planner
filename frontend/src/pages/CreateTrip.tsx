@@ -9,6 +9,7 @@ High Line, Manhattan — 90 minutes
 Balthazar, 80 Spring Street — 7pm reservation, 2 hours`;
 
 export default function CreateTrip() {
+  const [name, setName] = useState<string>("");
   const [city, setCity] = useState<string>("");
   const [date, setDate] = useState<string>("");
   const [startTime, setStartTime] = useState<string>("09:00");
@@ -28,7 +29,7 @@ export default function CreateTrip() {
 ${stops}`;
 
     try {
-      const created = await createTrip(rawText);
+      const created = await createTrip(rawText, name);
       navigate(`/trips/${created.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create trip");
@@ -53,6 +54,23 @@ ${stops}`;
           onSubmit={handleSubmit}
           className="space-y-4 rounded-lg bg-white p-8 shadow"
         >
+          <div className="space-y-1">
+            <label
+              htmlFor="name"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Trip name
+            </label>
+            <input
+              id="name"
+              type="text"
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="NYC museum day"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+            />
+          </div>
           <div className="space-y-1">
             <label
               htmlFor="city"
@@ -160,8 +178,9 @@ ${stops}`;
 
           {loading && (
             <p className="text-center text-xs text-gray-500">
-              Parsing your text, finding each place, routing between them, and
-              building the schedule. This usually takes about 30 seconds.
+              Parsing your stops, finding each place, calculating driving routes
+              between them, and building the schedule. This usually takes about
+              30 seconds.
             </p>
           )}
         </form>

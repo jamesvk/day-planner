@@ -12,18 +12,23 @@ export async function handlePlanTrip(req: AuthenticatedRequest, res: Response) {
     if (!req.user) {
       return res.status(401).json({ message: "Not Authorized" });
     }
-    const { rawText }: ParseRequest = req.body;
+    const { rawText, name }: { rawText: string; name: string } = req.body;
 
     if (!rawText || typeof rawText !== "string") {
       return res
         .status(400)
         .json({ message: "rawText is required and must be a string" });
     }
+    if (!name || typeof name !== "string") {
+      return res
+        .status(400)
+        .json({ message: "name is required and must be a string" });
+    }
 
     const trip = await planTrip({ rawText });
-    const savedTripId = await saveTrip(trip, req.user.id);
+    const savedTripId = await saveTrip(trip, req.user.id, name);
 
-    return res.status(200).json({ ...trip, id: savedTripId });
+    return res.status(200).json({ ...trip, id: savedTripId, name });
   } catch (err) {
     if (err instanceof ValidationError) {
       return res.status(400).json({ message: err.message });

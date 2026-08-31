@@ -4,6 +4,7 @@ import type { NarratedTrip } from "../types.js";
 export default async function saveTrip(
   input: NarratedTrip,
   id: string,
+  name: string,
 ): Promise<string> {
   const { rawText, date, transportMode, dayStart, dayEnd, feasible, summary } =
     input;

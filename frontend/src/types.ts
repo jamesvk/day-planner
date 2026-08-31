@@ -56,6 +56,7 @@ interface ScheduledStop {
 
 export interface CreatedTrip {
   id: string;
+  name: string;
   summary: string;
   scheduledStops: ScheduledStop[];
   feasible: boolean;
@@ -68,6 +69,7 @@ export interface CreatedTrip {
 
 export interface TripSummary {
   id: string;
+  name: string;
   rawText: string;
   date: string;
   transportMode: "driving" | "walking" | "transit";
@@ -95,6 +97,7 @@ interface RetrievedStop {
 
 export interface RetrievedTrip {
   id: string;
+  name: string;
   rawText: string;
   date: string;
   transportMode: "driving" | "walking" | "transit";

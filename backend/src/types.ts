@@ -100,6 +100,7 @@ interface RetrievedStop {
 
 export interface RetrievedTrip {
   id: string;
+  name: string;
   rawText: string;
   date: string;
   transportMode: TransportMode;
@@ -113,6 +114,7 @@ export interface RetrievedTrip {
 
 export interface TripSummary {
   id: string;
+  name: string;
   rawText: string;
   date: Date;
   transportMode: TransportMode;
