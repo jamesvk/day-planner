@@ -9,6 +9,7 @@ export default async function getAllTrips(
             SELECT
                 t.id,
                 t.name,
+                t.city,
                 t.raw_text AS "rawText",
                 t.date,
                 t.transport_mode AS "transportMode",

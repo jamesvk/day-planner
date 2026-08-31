@@ -70,6 +70,7 @@ export interface CreatedTrip {
 export interface TripSummary {
   id: string;
   name: string;
+  city: string;
   rawText: string;
   date: string;
   transportMode: "driving" | "walking" | "transit";
@@ -98,6 +99,7 @@ interface RetrievedStop {
 export interface RetrievedTrip {
   id: string;
   name: string;
+  city: string;
   rawText: string;
   date: string;
   transportMode: "driving" | "walking" | "transit";

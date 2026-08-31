@@ -42,44 +42,43 @@ export default function TripList() {
           </Link>
         </div>
         {trips.length > 0 ? (
-          trips.map((trip) => {
-            const heading = trip.summary.split("\n")[0].replace(/^#\s*/, "");
-            const city = heading
-              .replace(/^Your\s+/, "")
-              .replace(/\s+Day Trip.*$/, "");
-            return (
-              <Link
-                key={trip.id}
-                to={`/trips/${trip.id}`}
-                className="block rounded-lg border border-indigo-100 bg-indigo-50 p-4 shadow-sm transition hover:border-indigo-300 hover:bg-indigo-100 hover:shadow"
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <p className="truncate font-medium text-gray-900">{city}</p>
-                  <span
-                    className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${
-                      trip.feasible
-                        ? "bg-green-100 text-green-700"
-                        : "bg-amber-100 text-amber-700"
-                    }`}
-                  >
-                    {trip.feasible ? "Fits" : "Needs adjusting"}
+          trips.map((trip) => (
+            <Link
+              key={trip.id}
+              to={`/trips/${trip.id}`}
+              className="block rounded-lg border border-indigo-100 bg-indigo-50 p-4 shadow-sm transition hover:border-indigo-300 hover:bg-indigo-100 hover:shadow"
+            >
+              <div className="flex items-center justify-between gap-3">
+                <p className="truncate font-medium text-gray-900">
+                  {trip.name}
+                  <span className="ml-2 font-normal text-gray-500">
+                    {trip.city.split(",")[0]}
                   </span>
-                </div>
-                <p className="mt-1 text-sm text-gray-500">
-                  {new Date(trip.date).toLocaleDateString(undefined, {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
-                  {" · "}
-                  {trip.transportMode}
-                  {" · "}
-                  {trip.stopCount} stops{" · "}
-                  {trip.dayStart.slice(0, 5)}–{trip.dayEnd.slice(0, 5)}
                 </p>
-              </Link>
-            );
-          })
+                <span
+                  className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${
+                    trip.feasible
+                      ? "bg-green-100 text-green-700"
+                      : "bg-amber-100 text-amber-700"
+                  }`}
+                >
+                  {trip.feasible ? "Fits" : "Needs adjusting"}
+                </span>
+              </div>
+              <p className="mt-1 text-sm text-gray-500">
+                {new Date(trip.date).toLocaleDateString(undefined, {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                })}
+                {" · "}
+                {trip.transportMode}
+                {" · "}
+                {trip.stopCount} stops{" · "}
+                {trip.dayStart.slice(0, 5)}–{trip.dayEnd.slice(0, 5)}
+              </p>
+            </Link>
+          ))
         ) : (
           <div className="rounded-lg border border-dashed border-gray-300 bg-white p-12 text-center text-sm text-gray-500">
             No trips yet.

@@ -10,6 +10,7 @@ export default async function getTrip(
         SELECT json_build_object(
             'id', t.id,
             'name', t.name,
+            'city', t.city,
             'rawText', t.raw_text,
             'date', t.date,
             'transportMode', t.transport_mode,

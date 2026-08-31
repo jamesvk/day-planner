@@ -6,15 +6,34 @@ export default async function saveTrip(
   id: string,
   name: string,
 ): Promise<string> {
-  const { rawText, date, transportMode, dayStart, dayEnd, feasible, summary } =
-    input;
+  const {
+    rawText,
+    city,
+    date,
+    transportMode,
+    dayStart,
+    dayEnd,
+    feasible,
+    summary,
+  } = input;
   const client = await pool.connect();
 
   try {
     await client.query("BEGIN");
     const savedTrip = await client.query(
-      `INSERT INTO trips (raw_text, date, transport_mode, day_start, day_end, feasible, summary, user_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
-      [rawText, date, transportMode, dayStart, dayEnd, feasible, summary, id],
+      `INSERT INTO trips (raw_text, date, transport_mode, day_start, day_end, feasible, summary, user_id, name, city) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id`,
+      [
+        rawText,
+        date,
+        transportMode,
+        dayStart,
+        dayEnd,
+        feasible,
+        summary,
+        id,
+        name,
+        city,
+      ],
     );
     const savedTripId = savedTrip.rows[0].id as string;
 

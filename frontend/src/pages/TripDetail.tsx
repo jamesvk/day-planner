@@ -1,15 +1,17 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import type { RetrievedTrip } from "../types";
-import { getTrip } from "../api/trips";
+import { getTrip, deleteTrip } from "../api/trips";
 
 export default function TripDetail() {
   const { id } = useParams<{ id: string }>();
   const [trip, setTrip] = useState<RetrievedTrip | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<boolean>(false);
 
+  const navigate = useNavigate();
   useEffect(() => {
     if (!id) {
       setError("No trip id");
@@ -41,8 +43,19 @@ export default function TripDetail() {
       <p className="p-8 text-center text-sm text-gray-500">Trip not found.</p>
     );
 
-  const heading = trip.summary.split("\n")[0].replace(/^#\s*/, "");
-  const city = heading.replace(/^Your\s+/, "").replace(/\s+Day Trip.*$/, "");
+  const handleDelete = async () => {
+    if (!trip) return;
+    if (!window.confirm("Delete this trip? This can't be undone.")) return;
+
+    setDeleting(true);
+    try {
+      await deleteTrip(trip.id);
+      navigate("/trips");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete trip");
+      setDeleting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 px-4 py-8">
@@ -53,13 +66,25 @@ export default function TripDetail() {
         >
           &larr; Back to trips
         </Link>
-        <h1 className="text-2xl font-semibold text-gray-900">Trip detail</h1>
-
+        <div className="flex items-center justify-between gap-3">
+          <h1 className="text-2xl font-semibold text-gray-900">Trip detail</h1>
+          <button
+            onClick={handleDelete}
+            disabled={deleting}
+            className="shrink-0 rounded-md border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-60"
+          >
+            {deleting ? "Deleting…" : "Delete trip"}
+          </button>
+        </div>
         <div className="rounded-lg border border-indigo-100 bg-indigo-50 p-6">
-          {" "}
           <div className="flex items-start justify-between gap-3">
             <div>
-              <h1 className="text-2xl font-semibold text-gray-900">{city}</h1>
+              <p className="truncate font-medium text-gray-900">
+                {trip.name}
+                <span className="ml-2 font-normal text-gray-500">
+                  {trip.city.split(",")[0]}
+                </span>
+              </p>
               <p className="mt-1 text-sm text-gray-500">
                 {new Date(trip.date).toLocaleDateString(undefined, {
                   month: "short",
@@ -81,7 +106,7 @@ export default function TripDetail() {
         </div>
 
         <div className="space-y-3">
-          {trip.scheduledStops.map((s, i) => (
+          {trip.scheduledStops.map((s) => (
             <div key={s.id}>
               <div className="rounded-lg border border-gray-200 bg-white p-4">
                 <p className="text-sm font-medium text-gray-500">
