@@ -4,12 +4,33 @@ import { permute } from "../utils/permutations.js";
 import { totalTravel } from "../utils/totalTravel.js";
 import { ValidationError } from "../utils/errors.js";
 
+const ORDER_WEIGHT = 45; // minutes charged per out-of-sequence pair
+const IDLE_WEIGHT = 0.25; // fraction of a minute charged per waiting minute
+
 function runsPastMidnight(trip: ScheduledTrip): boolean {
   return trip.scheduledStops.some(
     (s) =>
       Number(s.arrivalTime.slice(0, 2)) >= 24 ||
       Number(s.departureTime.slice(0, 2)) >= 24,
   );
+}
+
+function totalIdle(trip: ScheduledTrip): number {
+  return trip.scheduledStops.reduce((sum, s) => {
+    const arrival = timeToMinutes(s.arrivalTime);
+    const departure = timeToMinutes(s.departureTime);
+    return sum + Math.max(0, departure - arrival - s.stop.durationMinutes);
+  }, 0);
+}
+
+function orderInversions(order: number[]): number {
+  let count = 0;
+  for (let i = 0; i < order.length; i++) {
+    for (let j = i + 1; j < order.length; j++) {
+      if (order[i]! > order[j]!) count++;
+    }
+  }
+  return count;
 }
 
 function scheduleOneOrder(input: RoutableTrip, order: number[]): ScheduledTrip {
@@ -73,9 +94,9 @@ function scheduleOneOrder(input: RoutableTrip, order: number[]): ScheduledTrip {
 
 export function scheduleTrip(input: RoutableTrip): ScheduledTrip {
   let bestFeasible: ScheduledTrip | null = null;
-  let bestFeasibleTime = Infinity;
+  let bestFeasibleScore = Infinity;
   let bestOverall: ScheduledTrip | null = null;
-  let bestOverallTime = Infinity;
+  let bestOverallScore = Infinity;
 
   const allPermutations: number[][] = permute(
     input.stops.map((_, index) => index),
@@ -83,18 +104,20 @@ export function scheduleTrip(input: RoutableTrip): ScheduledTrip {
 
   for (const order of allPermutations) {
     const scheduleCandidate = scheduleOneOrder(input, order);
-    const travelTime = totalTravel(scheduleCandidate);
 
-    // update bestOverall (any trip, least travel)
-    if (travelTime < bestOverallTime) {
+    const score =
+      totalTravel(scheduleCandidate) +
+      ORDER_WEIGHT * orderInversions(order) +
+      IDLE_WEIGHT * totalIdle(scheduleCandidate);
+
+    if (score < bestOverallScore) {
       bestOverall = scheduleCandidate;
-      bestOverallTime = travelTime;
+      bestOverallScore = score;
     }
 
-    // update bestFeasible (only feasible trips, least travel)
-    if (scheduleCandidate.feasible && travelTime < bestFeasibleTime) {
+    if (scheduleCandidate.feasible && score < bestFeasibleScore) {
       bestFeasible = scheduleCandidate;
-      bestFeasibleTime = travelTime;
+      bestFeasibleScore = score;
     }
   }
 
