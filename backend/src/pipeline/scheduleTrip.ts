@@ -2,6 +2,7 @@ import type { RoutableTrip, ScheduledTrip, ScheduledStop } from "../types.js";
 import { timeToMinutes, minutesToTime } from "../utils/time.js";
 import { permute } from "../utils/permutations.js";
 import { totalTravel } from "../utils/totalTravel.js";
+import { ValidationError } from "../utils/errors.js";
 
 function scheduleOneOrder(input: RoutableTrip, order: number[]): ScheduledTrip {
   let currentTime = timeToMinutes(input.dayStart);
@@ -45,8 +46,21 @@ function scheduleOneOrder(input: RoutableTrip, order: number[]): ScheduledTrip {
       travelToNextMinutes: travelToNext,
     });
   }
+
+  for (const s of scheduledStops) {
+    if (
+      Number(s.arrivalTime.slice(0, 2)) >= 24 ||
+      Number(s.departureTime.slice(0, 2)) >= 24
+    ) {
+      throw new ValidationError(
+        "This itinerary runs past midnight. Try removing a stop, shortening a visit, or widening your day.",
+      );
+    }
+  }
+
   return {
     rawText: input.rawText,
+    city: input.city,
     date: input.date,
     transportMode: input.transportMode,
     dayStart: input.dayStart,
