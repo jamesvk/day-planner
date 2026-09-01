@@ -1,12 +1,20 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { getTrips } from "../api/trips";
 import type { TripSummary } from "../types";
+import { useAuth } from "../context/AuthContext";
 
 export default function TripList() {
   const [trips, setTrips] = useState<TripSummary[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
 
   useEffect(() => {
     const load = async () => {
@@ -34,12 +42,20 @@ export default function TripList() {
       <div className="mx-auto max-w-3xl space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold text-gray-900">Your trips</h1>
-          <Link
-            to="/trips/new"
-            className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
-          >
-            New trip
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link
+              to="/trips/new"
+              className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+            >
+              New trip
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="rounded-md bg-red-400 px-4 py-2 text-sm font-medium text-gray-900 hover:bg-red-500"
+            >
+              Log out
+            </button>
+          </div>
         </div>
         {trips.length > 0 ? (
           trips.map((trip) => (
