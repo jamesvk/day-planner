@@ -7,7 +7,12 @@ import authRoutes from "./routes/authRoutes.js";
 
 const app = express();
 
-app.use(cors({ origin: "http://localhost:5173" }));
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://day-planner-theta-ochre.vercel.app",
+];
+
+app.use(cors({ origin: allowedOrigins }));
 app.use(express.json());
 
 app.get("/", (req, res) => {
