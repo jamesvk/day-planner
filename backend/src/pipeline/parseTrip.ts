@@ -21,6 +21,7 @@ export async function parseTrip(input: ParseRequest): Promise<ParsedTrip> {
         "stops": [ { "name": "Parc des Princes", "event": "PSG soccer game vs Lyon",
         "address": "24 Rue du Commandant Guilbaud, Paris",
         "durationMinutes": 60, "fixedTimes": { "start": "20:00", "end": "22:00" } } ] }
+        durationMinutes is required for every stop; if the user doesn't say how long, estimate a sensible default.
         Dates must be formatted as YYYY-MM-DD and times as HH:MM (24-hour).
         city must be the main city or town the stops are in, written in expanded form with its state or country — "New York, New York, USA", not "NYC". If stops span several nearby towns, use the largest or most central one. If the text does not make the location clear, return an empty string for city — do not guess.
         transportMode must be exactly one of: driving, walking, transit.
@@ -47,6 +48,7 @@ export async function parseTrip(input: ParseRequest): Promise<ParsedTrip> {
   const jsonString = responseText.slice(start, end + 1);
 
   let parsed: ParsedTrip;
+
   try {
     parsed = JSON.parse(jsonString) as ParsedTrip;
   } catch (error) {
