@@ -1,9 +1,5 @@
 import type { Request } from "express";
 
-export interface AuthTokenPayload {
-  id: string;
-}
-
 export interface AuthenticatedRequest extends Request {
   user?: { id: string };
 }

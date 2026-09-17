@@ -28,12 +28,14 @@ async function seedTrip(userId: string, overrides = {}) {
     dayEnd: '17:00',
     feasible: true,
     summary: 'A test trip summary',
+    name: 'test Trip name',
+    city: 'test city',
     ...overrides,
   };
 
   const result = await pool.query(
-    `INSERT INTO trips (user_id, raw_text, date, transport_mode, day_start, day_end, feasible, summary)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    `INSERT INTO trips (user_id, raw_text, date, transport_mode, day_start, day_end, feasible, summary, name, city)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
      RETURNING id`,
     [
       userId,
@@ -44,6 +46,8 @@ async function seedTrip(userId: string, overrides = {}) {
       trip.dayEnd,
       trip.feasible,
       trip.summary,
+      trip.name,
+      trip.city,
     ],
   );
   return result.rows[0].id;
@@ -123,21 +127,23 @@ describe('GET /api/trips', () => {
       .get('/api/trips/')
       .set('Authorization', `Bearer ${userA.body.accessToken}`);
 
-    const olderTrip = resGet.body[1];
+    const earliestTrip = resGet.body[0];
     expect(resGet.status).toBe(200);
     expect(resGet.body).toHaveLength(2);
-    expect(olderTrip.id).toBe(tripA1);
-    expect(olderTrip.rawText).toBe('test trip');
-    expect(olderTrip.date.slice(0, 10)).toBe('2026-09-01');
-    expect(olderTrip.transportMode).toBe('driving');
-    expect(olderTrip.dayStart.slice(0, 5)).toBe('09:00');
-    expect(olderTrip.dayEnd.slice(0, 5)).toBe('17:00');
-    expect(olderTrip.feasible).toBe(true);
-    expect(olderTrip.summary).toBe('A test trip summary');
-    expect(resGet.body[0].id).toBe(tripA2);
+    expect(earliestTrip.id).toBe(tripA1);
+    expect(earliestTrip.rawText).toBe('test trip');
+    expect(earliestTrip.date.slice(0, 10)).toBe('2026-09-01');
+    expect(earliestTrip.transportMode).toBe('driving');
+    expect(earliestTrip.dayStart.slice(0, 5)).toBe('09:00');
+    expect(earliestTrip.dayEnd.slice(0, 5)).toBe('17:00');
+    expect(earliestTrip.feasible).toBe(true);
+    expect(earliestTrip.summary).toBe('A test trip summary');
+    expect(resGet.body[1].id).toBe(tripA2);
     expect(resGet.body.map((t: { id: string }) => t.id)).not.toContain(
       otherUserTrip,
     );
+    expect(earliestTrip.name).toBe('test Trip name');
+    expect(earliestTrip.city).toBe('test city');
   });
 
   it('returns 401 without a token', async () => {
