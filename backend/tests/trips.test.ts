@@ -96,6 +96,20 @@ describe('POST /api/trips', () => {
       .send({ rawText: 'Random Test Trip Rawtext Input' });
     expect(resPost.status).toBe(401);
   });
+
+  it('returns 401 when the user associated with a valid, unexpired token no longer exists in the database', async () => {
+    const userA = await registerTestUser();
+    const token = userA.body.accessToken;
+
+    await pool.query('DELETE FROM users WHERE id = $1', [userA.body.id]);
+
+    const resPost = await request(app)
+      .post(`/api/trips/`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ rawText: 'Random Test Trip Rawtext Input' });
+
+    expect(resPost.status).toBe(401);
+  });
 });
 
 describe('GET /api/trips', () => {
@@ -167,6 +181,19 @@ describe('GET /api/trips', () => {
 
     expect(resGet.status).toBe(200);
     expect(resGet.body).toHaveLength(0);
+  });
+
+  it('returns 401 when the user associated with a valid, unexpired token no longer exists in the database', async () => {
+    const userA = await registerTestUser();
+    const token = userA.body.accessToken;
+
+    await pool.query('DELETE FROM users WHERE id = $1', [userA.body.id]);
+
+    const resGet = await request(app)
+      .get('/api/trips/')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(resGet.status).toBe(401);
   });
 });
 

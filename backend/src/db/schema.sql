@@ -7,6 +7,13 @@
 -- an empty database (e.g. the test database).
 -- ============================================================
 
+-- ------------------------------------------------------------
+-- Reset. Every run is a full rebuild: drop children before
+-- parents (CASCADE handles dependents), then recreate below.
+-- ALL DATA IS DESTROYED on each run — acceptable pre-launch;
+-- replace with numbered migrations before real user data exists.
+-- ------------------------------------------------------------
+DROP TABLE IF EXISTS scheduled_stops, trips, users CASCADE;
 
 -- ------------------------------------------------------------
 -- users
@@ -37,6 +44,8 @@ CREATE TABLE trips (
     user_id         UUID         NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     raw_text        TEXT         NOT NULL,
     date            DATE         NOT NULL,
+    name            TEXT         NOT NULL DEFAULT '',
+    city            TEXT         NOT NULL DEFAULT '',
     transport_mode  TEXT         NOT NULL
                                  CHECK (transport_mode IN ('driving', 'walking', 'transit')),
     day_start       TIME         NOT NULL,
