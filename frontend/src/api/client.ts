@@ -2,7 +2,7 @@
 export const API_URL = import.meta.env.VITE_API_URL as string;
 
 function getToken(): string | null {
-  return localStorage.getItem('token');
+  return localStorage.getItem("token");
 }
 
 export async function apiFetch<T>(
@@ -14,7 +14,7 @@ export async function apiFetch<T>(
   const res = await fetch(`${API_URL}${path}`, {
     ...options,
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(options.headers ?? {}),
     },
@@ -23,6 +23,6 @@ export async function apiFetch<T>(
   if (res.status === 204) return undefined as T;
 
   const data = await res.json();
-  if (!res.ok) throw new Error(data.message || 'Request failed');
+  if (!res.ok) throw new Error(data.message || "Request failed");
   return data as T;
 }

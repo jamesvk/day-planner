@@ -28,12 +28,12 @@ export async function handlePlanTrip(req: AuthenticatedRequest, res: Response) {
     const trip = await planTrip({ rawText });
     const savedTripId = await saveTrip(trip, req.user.id, name);
 
-    return res.status(200).json({ ...trip, id: savedTripId, name });
+    return res.status(201).json({ ...trip, id: savedTripId, name });
   } catch (err) {
     if (err instanceof ValidationError) {
       return res.status(400).json({ message: err.message });
     }
-    console.error(err);
+    console.error("handlePlanTrip error: ", err);
     return res.status(500).json({ message: "Failed to plan trip" });
   }
 }
@@ -44,7 +44,7 @@ export async function handleGetTrips(req: AuthenticatedRequest, res: Response) {
       return res.status(401).json({ message: "Not Authorized" });
     }
     const trips = await getAllTrips(req.user.id);
-    res.status(200).json(trips);
+    return res.status(200).json(trips);
   } catch (err) {
     console.error("handleGetTrips error: ", err);
     return res.status(500).json({ message: "Failed to retrieve trips" });
@@ -64,7 +64,7 @@ export async function handleGetTrip(req: AuthenticatedRequest, res: Response) {
 
     const trip = await getTrip(id, req.user.id);
     if (!trip) return res.status(404).json({ message: "Trip not found" });
-    else return res.status(200).json(trip);
+    return res.status(200).json(trip);
   } catch (err) {
     console.error("handleGetTrip error: ", err);
     return res.status(500).json({ message: "Failed to retrieve trip" });
