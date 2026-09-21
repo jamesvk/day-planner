@@ -2,10 +2,40 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import request from 'supertest';
 import app from '../src/app.js';
 import pool from '../src/db.js';
+import { vi } from 'vitest';
 
 beforeEach(async () => {
   await pool.query('TRUNCATE users, trips, scheduled_stops CASCADE');
 });
+
+vi.mock('../src/pipeline/planTrip.js', () => ({
+  planTrip: vi.fn().mockResolvedValue({
+    // TripMeta
+    rawText: 'Random Test Trip Rawtext Input',
+    date: '2026-09-21',
+    city: 'Paris',
+    transportMode: 'driving',
+    dayStart: '09:00',
+    dayEnd: '18:00',
+    // ScheduledTrip
+    feasible: true,
+    scheduledStops: [
+      {
+        stop: {
+          name: 'Louvre',
+          durationMinutes: 120,
+          place_id: 'test-place-id-1',
+          location: { lat: 48.8606, lng: 2.3376 },
+        },
+        arrivalTime: '10:00',
+        departureTime: '12:00',
+        travelToNextMinutes: 0,
+      },
+    ],
+    // NarratedTrip
+    summary: 'Test trip summary',
+  }),
+}));
 
 async function registerTestUser(overrides = {}) {
   return request(app)
@@ -95,6 +125,24 @@ describe('POST /api/trips', () => {
       .post(`/api/trips/`)
       .send({ rawText: 'Random Test Trip Rawtext Input' });
     expect(resPost.status).toBe(401);
+  });
+
+  it('returns 201 when a trip is successfully created', async () => {
+    const userA = await registerTestUser();
+    const token = userA.body.accessToken;
+
+    const resPost = await request(app)
+      .post('/api/trips/')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        rawText: 'Tomorrow in Paris: Louvre at 10am for 2 hours',
+        name: 'Random Trip Name',
+      });
+
+    expect(resPost.status).toBe(201);
+    expect(resPost.body.id).toBeDefined(); // saveTrip really inserted
+    expect(resPost.body.name).toBe('Random Trip Name');
+    expect(resPost.body.summary).toBe('Test trip summary'); // mock flowed through
   });
 
   it('returns 401 when the user associated with a valid, unexpired token no longer exists in the database', async () => {
