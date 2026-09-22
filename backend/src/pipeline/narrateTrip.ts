@@ -26,7 +26,7 @@ export async function narrateTrip(input: ScheduledTrip): Promise<NarratedTrip> {
       start time begins), and suggest the user could add another activity during those gaps to
       make the most of the day. Keep the tone warm and concise. Refer to any event names
       (the event field) where present. If the transport mode is driving, remind them to allow
-      extra time for traffic and parking." That way it doesn't tell a walker to worry about parking`,
+      extra time for traffic and parking.`,
       messages: [{ role: "user", content: JSON.stringify(input) }],
     });
   } catch (error) {

@@ -16,7 +16,7 @@ export async function planTrip(input: ParseRequest): Promise<NarratedTrip> {
   const parsedTrip = await parseTrip(input);
   const geocodedTrip = await geocodeTrip(parsedTrip);
   const routedTrip = await routeTrip(geocodedTrip);
-  const scheduledTrip = await scheduleTrip(routedTrip);
+  const scheduledTrip = scheduleTrip(routedTrip);
   const narratedTrip = await narrateTrip(scheduledTrip);
 
   return narratedTrip;
