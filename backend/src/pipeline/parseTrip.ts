@@ -45,6 +45,12 @@ export async function parseTrip(input: ParseRequest): Promise<ParsedTrip> {
   const responseText = block.text;
   const start = responseText.indexOf("{");
   const end = responseText.lastIndexOf("}");
+
+  if (start === -1 || end === -1) {
+    throw new ValidationError(
+      "Couldn't understand that trip description — please rephrase it.",
+    );
+  }
   const jsonString = responseText.slice(start, end + 1);
 
   let parsed: ParsedTrip;
@@ -52,15 +58,18 @@ export async function parseTrip(input: ParseRequest): Promise<ParsedTrip> {
   try {
     parsed = JSON.parse(jsonString) as ParsedTrip;
   } catch (error) {
-    throw new Error(
-      `Failed to parse Claude's response as JSON: ${responseText}`,
+    console.error("parseTrip JSON parse failed:", responseText);
+    throw new ValidationError(
+      "Couldn't understand that trip description — please rephrase it.",
     );
   }
+
   if (!parsed.city) {
     throw new ValidationError(
       "Please include the city or town your trip takes place in.",
     );
   }
 
+  // Pipeline currently routes via OSRM driving profile only — override until walking/transit supported
   return normalizeDayWindow({ ...input, ...parsed, transportMode: "driving" });
 }

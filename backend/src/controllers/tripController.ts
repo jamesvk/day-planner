@@ -33,7 +33,7 @@ export async function handlePlanTrip(req: AuthenticatedRequest, res: Response) {
     if (err instanceof ValidationError) {
       return res.status(400).json({ message: err.message });
     }
-    console.error("handlePlanTrip error: ", err);
+    console.error(err);
     return res.status(500).json({ message: "Failed to plan trip" });
   }
 }
@@ -64,7 +64,7 @@ export async function handleGetTrip(req: AuthenticatedRequest, res: Response) {
 
     const trip = await getTrip(id, req.user.id);
     if (!trip) return res.status(404).json({ message: "Trip not found" });
-    return res.status(200).json(trip);
+    else return res.status(200).json(trip);
   } catch (err) {
     console.error("handleGetTrip error: ", err);
     return res.status(500).json({ message: "Failed to retrieve trip" });
