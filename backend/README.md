@@ -104,13 +104,19 @@ When user B requests a trip owned by user A, B is fully authenticated — the to
 
 Every test passed when its file ran alone, but running the full suite produced five failures. The cause: Vitest runs test _files_ in parallel workers, and both files share one test database — so one file's `TRUNCATE` wiped users mid-test in the other, and both files registering the same test email collided (409 → no token → cascading 401s). Classic race condition: shared mutable state plus parallel workers. The fix is `fileParallelism: false` in the Vitest config, which runs the files sequentially. The tradeoff is a slightly slower suite — the right price at this scale; per-worker databases would be the scaling solution.
 
+### 4. An error taxonomy: what's the user's fault vs the system's
+
+Pipeline stages fail for two fundamentally different reasons, and the API should distinguish them. A custom `ValidationError` marks user-fixable problems — a trip description the LLM can't parse into stops, an itinerary that can't fit inside the day — and maps to 400 with a message the user can act on. Everything else (the LLM returning an unexpected shape, OSRM being down) is a system fault: generic `Error`, 500, details logged server-side via `console.error` rather than leaked to the client. `routeTrip` applies this at two layers, because the transport and the API can fail independently: a `response.ok` guard catches non-2xx responses (whose bodies may not even be JSON) before parsing, and a `data.code` check catches OSRM rejecting the request inside an HTTP 200.
+
 ## Testing
 
-23 integration tests across two files (`auth.test.ts`, `trips.test.ts`), written with Vitest + supertest and run against a real, separate Postgres test database — selected by a `NODE_ENV` switch in the db module, so the suite can truncate tables freely with zero risk to production.
+39 tests across seven files: 23 integration tests (`auth.test.ts`, `trips.test.ts`) written with Vitest + supertest against a real, separate Postgres test database — selected by a `NODE_ENV` switch in the db module, so the suite can truncate tables freely with zero risk to production — plus unit tests covering the pipeline stages.
 
 The auth suite covers registration (success with a DB-level check, duplicate email → 409, case-insensitive duplicate → 409, lowercase normalization, missing fields → 400) and login (success → 200 + token, wrong password and unknown email both → 401 with the identical generic message, so responses can't be used to enumerate accounts).
 
 The trips suite seeds data directly with SQL rather than calling `POST /api/trips`, because these tests target the route layer — auth guarding, ownership, status codes — and invoking the real pipeline would add ~30 seconds per test, spend API credits, and couple the suite to three external services. What the tests prove: every route rejects missing and invalid tokens (401); users can only ever see their own trips (two-user tests assert another user's trip is absent from lists and returns 404 by id); deletes are verified at the database level (a non-owner's delete leaves the row in place, an owner's delete removes it); and the `json_agg` read model returns nested, ordered stops — including an empty array for a stopless trip.
+
+The pipeline unit tests exercise three distinct test seams. `parseTrip` mocks the Anthropic SDK at the module boundary (`vi.mock`), covering malformed-JSON and missing-content failure paths against the error taxonomy above. `geocodeTrip` and `routeTrip` stub the global `fetch` binding (`vi.stubGlobal`), covering retry-with-address-fallback and transport-level failures — including the case where an upstream error page would otherwise reach `JSON.parse`. `scheduleTrip` is a pure function and is tested with no mocks at all: a hand-built fixture with a travel-time matrix rigged so exactly one stop order should win, asserted against a hand-derived expected schedule.
 
 Test files share one database, so file-level parallelism is disabled in the Vitest config (`fileParallelism: false`) — every test passed in isolation, and only the full-suite run exposed the race.
 
@@ -165,4 +171,4 @@ npm run test:run   # test suite (needs TEST_DATABASE_URL, with the schema applie
 - **Map integration** — a map view of the route, with deep links to Google/Apple Maps for each stop and leg
 - **Trip editing via re-planning** — trips are immutable in v1 by design (edit = delete + re-plan); a proper edit flow would re-run the pipeline against modified stops
 - **UUID validation** — return 400 for malformed trip ids instead of the current 500 (see Known limitations)
-- **POST happy-path tests** — with a mocked pipeline, closing the deliberately-skipped coverage
+- **POST happy-path tests** — the mock infrastructure now exists for all three seams (SDK mock, fetch stub, pure fixtures); wiring a mocked-pipeline POST test is the remaining step
