@@ -12,6 +12,7 @@ async function geocodeOnce(query: string, viewbox?: string) {
     format: "jsonv2",
     limit: "1",
   });
+
   if (viewbox) {
     params.set("viewbox", viewbox);
     params.set("bounded", "0");
@@ -23,6 +24,7 @@ async function geocodeOnce(query: string, viewbox?: string) {
       headers: { "User-Agent": USER_AGENT },
     },
   );
+
   if (!response.ok) throw new Error(`Nominatim responded ${response.status}`);
 
   const data = await response.json();
@@ -41,6 +43,7 @@ function kmBetween(
 
 export async function geocodeTrip(input: ParsedTrip): Promise<GeocodedTrip> {
   const cityResult = await geocodeOnce(input.city);
+
   if (!cityResult) {
     throw new ValidationError(
       `Couldn't find "${input.city}". Try including the state or country.`,
