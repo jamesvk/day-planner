@@ -9,10 +9,15 @@ export async function routeTrip(input: GeocodedTrip): Promise<RoutableTrip> {
     const url = `https://router.project-osrm.org/table/v1/driving/${encodeURIComponent(coordString)}?annotations=duration`;
 
     const response = await fetch(url);
+    if (!response.ok) {
+      const body = await response.text();
+      console.error("routeTrip OSRM: ", response.status, body);
+      throw new Error(`OSRM failed: ${response.status}`);
+    }
     const data = await response.json();
 
     if (data.code !== "Ok" || !data.durations) {
-      throw new Error(`OSRM routing failed: ${data.code}`);
+      throw new Error(`OSRM code: ${data.code}`);
     }
 
     const travelTimes = data.durations.map((times: number[]) =>
